@@ -8,8 +8,7 @@ import {
   ContractCalledEvent,
   ByteString,
   findSig,
-  sigResps,
-  Bigint
+  SignatureResponse
 } from "scrypt-ts";
 import { scholarship } from "./contracts/voting";
 
@@ -239,7 +238,7 @@ const GpaPage: React.FC<{ username: string; onLogout: () => void }> = ({
       const { tx: callTx } = await scholarshipContract.methods.unlock(
         msg, RabinSig,
         // the first argument `sig` is replaced by a callback function which will return the needed signature
-        (sigResps) => findSig(sigResps, studentPK))
+        (sigResps:SignatureResponse[]) => findSig(sigResps, studentPK))
     } 
   }
 
