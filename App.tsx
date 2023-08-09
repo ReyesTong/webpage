@@ -169,9 +169,9 @@ const GpaPage: React.FC<{ username: string; onLogout: () => void }> = ({
     const [scholarshipContract, setContract] = useState<scholarship>();
     const signerRef = useRef<SensiletSigner>();
     const [error, setError] = React.useState("");
-    const [msg, setMsg] = useState('')
-    const [SigS, setSigS] = useState('')
-    const [SigU, setSigU] = useState('')
+    const [msg, setMsg] = useState<ByteString | null>('null')
+    const [SigS, setSigS] = useState<ByteString | null>('null')
+    const [SigU, setSigU] = useState<ByteString | null>('null')
     const signer = signerRef.current as SensiletSigner;
     if (scholarshipContract && signer) {
       const {isAuthenticated,error} = await signer.requestAuth();
