@@ -7,6 +7,9 @@ import {
   SensiletSigner,
   ContractCalledEvent,
   ByteString,
+  findSig,
+  sigResps,
+  Bigint
 } from "scrypt-ts";
 import { scholarship } from "./contracts/voting";
 
@@ -24,6 +27,14 @@ const users: User[] = [
 interface GpaResponse {
   GPA: number;
   digest: ByteString
+  Signatures:{
+    Rabin:{
+        PubKey: bigint,
+        Sig_S:ByteString,
+        Sig_U:ByteString
+      }
+    }
+
 }
 
 const LoginPage: React.FC<{ onLogin: (user: User) => void }> = ({ onLogin }) => {
@@ -159,6 +170,8 @@ const GpaPage: React.FC<{ username: string; onLogout: () => void }> = ({
     const signerRef = useRef<SensiletSigner>();
     const [error, setError] = React.useState("");
     const [msg, setMsg] = useState('')
+    const [SigS, setSigS] = useState('')
+    const [SigU, setSigU] = useState('')
     const signer = signerRef.current as SensiletSigner;
     if (scholarshipContract && signer) {
       const {isAuthenticated,error} = await signer.requestAuth();
@@ -179,6 +192,8 @@ const GpaPage: React.FC<{ username: string; onLogout: () => void }> = ({
             return response.json();
           })
           .then((data: GpaResponse) => setMsg(data.digest))
+          .then((data: GpaResponse) => setSigS(data.Signatures.Rabin.Sig_S))
+          .then((data: GpaResponse) => setSigU(data.Signatures.Rabin.Sig_U))
           .catch((error) => {
             console.error('Error fetching GPA:', error);
             
@@ -186,7 +201,14 @@ const GpaPage: React.FC<{ username: string; onLogout: () => void }> = ({
       }, [username]);
       const studentPK = signer.getDefaultPubkey()
       scholarshipContract.methods.parseGPA(msg)
-      scholarshipContract.methods.unlock(msg, studentPK)
+      const RabinSig = SigS + SigU
+      const { tx: callTx } = await scholarshipContract.methods.unlock(
+        msg, RabinSig,
+        // the first argument `sig` is replaced by a callback function which will return the needed signature
+        (sigResps) => findSig(sigResps, studentPK))
+    
+    
+    
 
 
     } 
