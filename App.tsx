@@ -192,10 +192,44 @@ const GpaPage: React.FC<{ username: string; onLogout: () => void }> = ({
             return response.json();
           })
           .then((data: GpaResponse) => setMsg(data.digest))
-          .then((data: GpaResponse) => setSigS(data.Signatures.Rabin.Sig_S))
-          .then((data: GpaResponse) => setSigU(data.Signatures.Rabin.Sig_U))
           .catch((error) => {
             console.error('Error fetching GPA:', error);
+            
+          });
+      }, [username]);
+      useEffect(() => {
+        // Replace 'API_ENDPOINT' with the actual API endpoint that provides GPA data based on the username.
+        const url = `http://16.171.36.57:5000/api/gpa?name=${username}`;
+        //const url = `http://localhost:5000/api/gpa?name=${username}`;
+    
+        fetch(url)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok.');
+            }
+            return response.json();
+          })
+          .then((data: GpaResponse) => setSigS(data.Signatures.Rabin.Sig_S))
+          .catch((error) => {
+            console.error('Error fetching Sig:', error);
+            
+          });
+      }, [username]);
+      useEffect(() => {
+        // Replace 'API_ENDPOINT' with the actual API endpoint that provides GPA data based on the username.
+        const url = `http://16.171.36.57:5000/api/gpa?name=${username}`;
+        //const url = `http://localhost:5000/api/gpa?name=${username}`;
+    
+        fetch(url)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok.');
+            }
+            return response.json();
+          })
+          .then((data: GpaResponse) => setSigU(data.Signatures.Rabin.Sig_U))
+          .catch((error) => {
+            console.error('Error fetching Sig:', error);
             
           });
       }, [username]);
@@ -206,11 +240,6 @@ const GpaPage: React.FC<{ username: string; onLogout: () => void }> = ({
         msg, RabinSig,
         // the first argument `sig` is replaced by a callback function which will return the needed signature
         (sigResps) => findSig(sigResps, studentPK))
-    
-    
-    
-
-
     } 
   }
 
